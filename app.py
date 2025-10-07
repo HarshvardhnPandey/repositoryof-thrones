@@ -1,50 +1,28 @@
 import os
-
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
-app.secret_key = "supersecret"  # Needed for session management
 
-# Dummy credentials
-USERNAME = "admin"
-PASSWORD = "123"
+# Home route → login page
 @app.route("/", methods=["GET", "POST"])
 def login():
-    error = None
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-        if username == USERNAME and password == PASSWORD:
-            session["logged_in"] = True
-            return redirect(url_for("meme"))
+        # You can add login logic here
+        if username == "admin" and password == "admin":  # example
+            return redirect(url_for("meme_page"))
         else:
-            error = "Invalid credentials. Try again!"
-    return render_template("login.html", error=error)
+            return render_template("login.html", error="Invalid credentials")
+    return render_template("login.html")
 
-@app.route("/meme")
-def meme():
-    if not session.get("logged_in"):
-        return redirect(url_for("login"))
-    return render_template("meme.html")
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("login"))
+# Meme page route
+@app.route("/memes")
+def meme_page():
+    # Example: you can pass a list of memes to display
+    memes = ["meme1.jpg", "meme2.jpg", "meme3.jpg"]
+    return render_template("meme.html", memes=memes)
 
 if __name__ == "__main__":
-    app.run(debug=True)
-
-
-
-
-app = Flask(__name__)
-
-@app.route("/")
-def home():
-    return "Hello, Render!"
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # <-- Use Render’s PORT
+    port = int(os.environ.get("PORT", 5000))  # Render dynamic port
     app.run(host="0.0.0.0", port=port)
-
